@@ -1,6 +1,6 @@
-# Developing With Elixir
+# Developing With Elixir/OTP
 
-This directory contains the source code for the [Developing With Elixir](https://pragmaticstudio.com/elixir) video course.
+Building an elementary HTTP web server (a mini-Phoenix) from scratch in Elixir. This is the source code for the [Developing With Elixir/OTP](https://pragmaticstudio.com/elixir) video course.
 
 ## Stepped Solutions
 
