@@ -11,7 +11,6 @@ defmodule Servy.Handler do
 		|> rewrite_path
 		|> log
 		|> route
-		# |> track
 		|> emojify
 		|> format_response
 	end
@@ -21,14 +20,6 @@ defmodule Servy.Handler do
 	end
 
 	def emojify(conv), do: conv
-
-	# def track(%{status: 404, path: path} = conv) do
-	# 	# IO.puts "Warning: #{path} not found"
-	# 	Logger.info "heyho #{path} not found"
-	# 	conv
-	# end
-
-	# def track(conv), do: conv
 
 	def rewrite_path(%{path: path} = conv) do
 		regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
@@ -63,10 +54,6 @@ defmodule Servy.Handler do
 			 status: nil
 		 }
 	end
-
-	# def route(conv) do
-	# 	route(conv, conv.method, conv.path)
-	# end
 
 	def route(%{method: "GET", path: "/wildthings"} = conv) do
 		%{ conv | status: 200, resp_body: "Lions, Tigers, Bears" }
