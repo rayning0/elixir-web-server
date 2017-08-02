@@ -3,6 +3,11 @@ defmodule Servy.Handler do
 	@moduledoc "Handles HTTP requests."
 	@pages_path Path.expand("../../pages", __DIR__)	#constant: absolute path of current file
 
+	import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]  # number is arity of each function
+	#import Servy.Plugins  -- or import ALL functions in module
+	import Servy.Parser, only: [parse: 1]
+	import Servy.FileHandler, only: [handle_file: 2]
+
 	require Logger
 
 	@doc "Transforms request into a response"
@@ -16,49 +21,8 @@ defmodule Servy.Handler do
 		|> rewrite_path
 		|> log
 		|> route
-		|> emojify
+		|> track
 		|> format_response
-	end
-
-	@doc "Adds emojis to start/end of response body for status 200 HTTP calls"
-	def emojify(%{status: 200, resp_body: resp_body} = conv) do
-		%{ conv | resp_body: "🏄💃#{resp_body}👯💋👀"}
-	end
-
-	def emojify(conv), do: conv
-
-	def rewrite_path(%{path: path} = conv) do
-		regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
-		captures = Regex.named_captures(regex, path)
-		rewrite_path_captures(conv, captures)
-	end
-
-	def rewrite_path(conv), do: conv
-
-	def rewrite_path_captures(conv, %{"thing" => thing, "id" => id}) do
-		%{ conv | path: "/#{thing}/#{id}" }
-	end
-
-	def rewrite_path_captures(conv, nil), do: conv
-
-	def log(conv), do: IO.inspect conv
-
-	def parse(request) do
-		# Parse request string into map
-		# first_line = request |> String.split("\n") |> List.first
-		# [method, path, _] = String.split(first_line, " ")
-
-		[method, path, _] =
-			request
-			|> String.split("\n")
-			|> List.first
-			|> String.split(" ")
-			
-		%{ method: method,
-			 path: path,
-			 resp_body: "",
-			 status: nil
-		 }
 	end
 
 	def route(%{method: "GET", path: "/wildthings"} = conv) do
@@ -123,19 +87,6 @@ defmodule Servy.Handler do
 
 	def route(%{path: path} = conv) do
 		%{ conv | status: 404, resp_body: "No #{path} here!"}
-	end
-
-	def handle_file({:ok, content}, conv) do
-		%{ conv | status: 200, resp_body: content }
-	end
-
-	def handle_file({:error, :enoent}, conv) do
-		page = String.split(conv.path, "/") |> List.last
-		%{ conv | status: 404, resp_body: "#{page}.html not found" }
-	end
-
-	def handle_file({:error, reason}, conv) do
-		%{ conv | status: 500, resp_body: "File error: #{reason}" }
 	end
 
 	def format_response(conv) do
