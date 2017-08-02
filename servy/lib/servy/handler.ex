@@ -112,7 +112,8 @@ defmodule Servy.Handler do
 	end
 
 	def handle_file({:error, :enoent}, conv) do
-		%{ conv | status: 404, resp_body: "File not found" }
+		page = String.split(conv.path, "/") |> List.last
+		%{ conv | status: 404, resp_body: "#{page}.html not found" }
 	end
 
 	def handle_file({:error, reason}, conv) do
