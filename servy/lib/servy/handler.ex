@@ -1,6 +1,11 @@
 defmodule Servy.Handler do
+
+	@moduledoc "Handles HTTP requests."
+	@pages_path Path.expand("../../pages", __DIR__)	#constant: absolute path of current file
+
 	require Logger
 
+	@doc "Transforms request into a response"
 	def handle(request) do
 		# conv = parse(request)
 		# conv = route(conv)
@@ -15,6 +20,7 @@ defmodule Servy.Handler do
 		|> format_response
 	end
 
+	@doc "Adds emojis to start/end of response body for status 200 HTTP calls"
 	def emojify(%{status: 200, resp_body: resp_body} = conv) do
 		%{ conv | resp_body: "🏄💃#{resp_body}👯💋👀"}
 	end
@@ -64,7 +70,7 @@ defmodule Servy.Handler do
 	end
 
 	def route(%{method: "GET", path: "/bears/new"} = conv) do
-		Path.expand("../../pages", __DIR__)	#absolute path of current file
+		@pages_path
 		|> Path.join("form.html")
 		|> File.read
 		|> handle_file(conv)
@@ -75,7 +81,7 @@ defmodule Servy.Handler do
 	end
 
 	def route(%{method: "GET", path: "/about"} = conv) do
-		Path.expand("../../pages", __DIR__)	#absolute path of current file
+		@pages_path
 		|> Path.join("about.html")
 		|> File.read
 		|> handle_file(conv)
@@ -88,23 +94,10 @@ defmodule Servy.Handler do
 	def route(%{method: "GET", path: "/pages/" <> page} = conv) do
 		# regex = ~r{\/pages\/(?<page>[\w'-]+)}
 		# page = Regex.named_captures(regex, path)["page"]
-		Path.expand("../../pages", __DIR__)	#absolute path of current file
+		@pages_path
 		|> Path.join(page <> ".html")
 		|> File.read
 		|> handle_file(conv)
-	end
-
-	def handle_file({:ok, content}, conv) do
-		%{ conv | status: 200, resp_body: content }
-	end
-
-	def handle_file({:error, :enoent}, conv) do
-		page = String.split(conv.path, "/") |> List.last
-		%{ conv | status: 404, resp_body: "#{page}.html not found" }
-	end
-
-	def handle_file({:error, reason}, conv) do
-		%{ conv | status: 500, resp_body: "File error: #{reason}" }
 	end
 
 	# def route(%{method: "GET", path: "/about"} = conv) do
@@ -130,6 +123,19 @@ defmodule Servy.Handler do
 
 	def route(%{path: path} = conv) do
 		%{ conv | status: 404, resp_body: "No #{path} here!"}
+	end
+
+	def handle_file({:ok, content}, conv) do
+		%{ conv | status: 200, resp_body: content }
+	end
+
+	def handle_file({:error, :enoent}, conv) do
+		page = String.split(conv.path, "/") |> List.last
+		%{ conv | status: 404, resp_body: "#{page}.html not found" }
+	end
+
+	def handle_file({:error, reason}, conv) do
+		%{ conv | status: 500, resp_body: "File error: #{reason}" }
 	end
 
 	def format_response(conv) do
