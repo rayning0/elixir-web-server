@@ -46,6 +46,13 @@ defmodule Servy.Handler do
 		%{ conv | status: 200, resp_body: "Bear #{id}" }		
 	end
 
+	# name=Baloo&type=Brown
+	def route(%Conv{method: "POST", path: "/bears"} = conv) do
+		%{ conv | status: 201,
+							resp_body: "Created a #{conv.params["type"]} bear,
+							#{conv.params["name"]}!" }
+	end
+
 	def route(%Conv{method: "GET", path: "/about"} = conv) do
 		@pages_path
 		|> Path.join("about.html")
@@ -65,23 +72,6 @@ defmodule Servy.Handler do
 		|> File.read
 		|> handle_file(conv)
 	end
-
-	# def route(%Conv{method: "GET", path: "/about"} = conv) do
-	# 	file =
-	# 		Path.expand("../../pages", __DIR__)	#absolute path of current file
-	# 		|> Path.join("about.html")
-
-	# 	case File.read(file) do
-	# 		{:ok, content} ->
-	# 			%{ conv | status: 200, resp_body: content }
-
-	# 		{:error, :enoent} ->
-	# 			%{ conv | status: 404, resp_body: "File not found" }
-
-	# 		{:error, reason} ->
-	# 			%{ conv | status: 500, resp_body: "File error: #{reason}" }
-	# 	end
-	# end
 
 	def route(%Conv{method: "DELETE", path: "/bears/" <> _id} = conv) do
 		%{ conv | status: 403, resp_body: "You may not delete a bear" }		
@@ -190,5 +180,17 @@ Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
 
+"""
+IO.puts Servy.Handler.handle(request)
+
+request = """
+POST /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+name=Baloo&type=Brown
 """
 IO.puts Servy.Handler.handle(request)
