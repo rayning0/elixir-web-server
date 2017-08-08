@@ -38,5 +38,5 @@ defmodule Servy.Parser do
   end
 
   # Default for all other Content-Types:
-  def parase_params(_, _), do: %{}
+  def parse_params(_, _), do: %{}
 end
