@@ -4,11 +4,14 @@ defmodule Servy.Plugins do
 
   @doc "Logs 404 requests"
   def track(%Conv{status: 404, path: path} = conv) do
-    IO.puts "Warning: #{path} doesn't exist!"
+    IO.puts "\nWarning: #{path} doesn't exist!\n"
     conv
   end
 
-  def track(%Conv{} = conv), do: conv
+  def track(%Conv{} = conv) do
+  	IO.puts ""
+  	conv
+  end
 
 	def rewrite_path(%Conv{path: path} = conv) do
 		regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
