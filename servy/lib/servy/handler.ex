@@ -1,5 +1,4 @@
 defmodule Servy.Handler do
-
   alias Servy.Conv
   alias Servy.BearController
 
@@ -74,7 +73,7 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "DELETE", path: "/bears/" <> _id} = conv) do
-    %{ conv | status: 403, resp_body: "You may not delete a bear" }
+    BearController.delete(conv, conv.params)
   end
 
   def route(%Conv{path: path} = conv) do
@@ -192,5 +191,14 @@ Content-Type: application/x-www-form-urlencoded
 Content-Length: 21
 
 name=Baloo&type=Brown
+"""
+IO.puts Servy.Handler.handle(request)
+
+request = """
+GET /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
 """
 IO.puts Servy.Handler.handle(request)

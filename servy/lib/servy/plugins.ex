@@ -1,5 +1,4 @@
 defmodule Servy.Plugins do
-
   alias Servy.Conv
 
   @doc "Logs 404 requests"
