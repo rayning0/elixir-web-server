@@ -12,6 +12,10 @@ defmodule Servy.Plugins do
     conv
   end
 
+  def rewrite_path(%Conv{path: "/wildlife"} = conv) do
+    %{ conv | path: "/wildthings" }
+  end
+
   def rewrite_path(%Conv{path: path} = conv) do
     regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
     captures = Regex.named_captures(regex, path)
