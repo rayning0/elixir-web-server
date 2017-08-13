@@ -1,0 +1,5 @@
+<h2>Edit Bear</h2>
+
+<%= render "form.html", Map.put(assigns, :action, bear_path(@conn, :update, @bear)) %>
+
+<span><%= link "Back", to: bear_path(@conn, :index) %></span>

@@ -1,0 +1,23 @@
+<h2>Show Bear</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @bear.name %>
+  </li>
+
+  <li>
+    <strong>Type:</strong>
+    <%= @bear.type %>
+  </li>
+
+  <li>
+    <strong>Hibernating:</strong>
+    <%= @bear.hibernating %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: bear_path(@conn, :edit, @bear) %></span>
+<span><%= link "Back", to: bear_path(@conn, :index) %></span>

@@ -1,0 +1,30 @@
+<h2>Listing Bears</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Hibernating</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for bear <- @bears do %>
+    <tr>
+      <td><%= bear.name %></td>
+      <td><%= bear.type %></td>
+      <td><%= bear.hibernating %></td>
+
+      <td class="text-right">
+        <span><%= link "Show", to: bear_path(@conn, :show, bear), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Edit", to: bear_path(@conn, :edit, bear), class: "btn btn-default btn-xs" %></span>
+        <span><%= link "Delete", to: bear_path(@conn, :delete, bear), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Bear", to: bear_path(@conn, :new) %></span>
