@@ -1,0 +1,11 @@
+<h1>All Bears</h1>
+
+<ul>
+  <%= for bear <- bears do %>
+    <li><%= bear.name %> - <%= bear.type %></li>
+  <% end %>
+</ul>
+
+  <%#     OR
+  <%#= Enum.map(bears, fn(bear) -> %>
+  <%#  end) %>

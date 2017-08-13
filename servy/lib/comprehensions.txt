@@ -1,0 +1,51 @@
+----Comprehensions----
+
+- Basic comprehension:
+for x <- [1,2,3], do: x * 3  ---triples list
+
+- For all combos of "size" and "color", lists them in tuples:
+
+for size <- ["S", "M", "L"], color <- [:red, :blue], do: {size, color}
+OUTPUT: [{"S", :red}, {"S", :blue}, {"M", :red}, {"M", :blue}, {"L", :red}, {"L", :blue}]
+
+- 52 cards:
+ranks =
+  [ "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" ]
+
+suits =
+  [ "♣", "♦", "♥", "♠" ]
+
+deck = for rank <- ranks, suit <- suits, do: {rank, suit}
+
+# Pick 13 random cards
+deck |> Enum.shuffle |> Enum.take(13) |> IO.inspect
+
+# Get list of 4 lists, each with 13 random cards
+deck |> Enum.shuffle |> Enum.chunk(13)|> IO.inspect
+
+- In eex template:
+
+  <%= for bear <- bears do %>
+    <li><%= bear.name %> - <%= bear.type %></li>
+  <% end %>
+
+----Pattern Matching Comprehensions----
+For list of tuples, get names of all who like dogs:
+
+prefs = [ {"Betty", :dog}, {"Bob", :dog}, {"Becky", :cat} ]
+for {name, :dog} <- pref, do: name
+  OUTPUT: ["Betty", "Bob"]
+
+  OR
+for {name, pet_choice} <- prefs, pet_choice == :dog, do: name
+  OR
+dog_lover? = fn(choice) -> choice == :dog end
+for {name, pet_choice} <- prefs, dog_lover?.(pet_choice), do: name
+
+----Change Map Keys from Strings to Atoms----
+style = %{"width" => 10, "height" => 20, "border" => "2px"}
+to do this:
+area = style[:width] * style[:height]  # doesn't work!
+
+:into option returns result of do: from list into other Collectable, like map
+for {key, val} <- style, into: %{}, do: {String.to_atom(key), val}
