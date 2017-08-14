@@ -1,0 +1,58 @@
+{
+  "bears": [
+    {
+      "id": 1,
+      "name": "Teddy",
+      "type": "Brown",
+      "hibernating": true
+    },
+    {
+      "id": 2,
+      "name": "Smokey",
+      "type": "Black"
+    },
+    {
+      "id": 3,
+      "name": "Paddington",
+      "type": "Brown"
+    },
+    {
+      "id": 4,
+      "name": "Scarface",
+      "type": "Grizzly",
+      "hibernating": true
+    },
+    {
+      "id": 5,
+      "name": "Snow",
+      "type": "Polar"
+    },
+    {
+      "id": 6,
+      "name": "Brutus",
+      "type": "Grizzly"
+    },
+    {
+      "id": 7,
+      "name": "Rosie",
+      "type": "Black",
+      "hibernating": true
+    },
+    {
+      "id": 8,
+      "name": "Roscoe",
+      "type": "Panda"
+    },
+    {
+      "id": 9,
+      "name": "Iceman",
+      "type": "Polar",
+      "hibernating": true
+    },
+    {
+      "id": 10,
+      "name": "Kenai",
+      "type": "Grizzly"
+    }
+  ]
+}

@@ -330,6 +330,66 @@ defmodule HandlerTest do
     assert remove_whitespace(response) == remove_whitespace(expected_response)
   end
 
+  test "POST /api/bears" do
+    request = """
+    POST /api/bears HTTP/1.1\r
+    Host: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    Content-Type: application/json\r
+    Content-Length: 21\r
+    \r
+    {"name": "Breezly", "type": "Polar"}
+    """
+
+    response = handle(request)
+
+    assert response == """
+    HTTP/1.1 201 Created\r
+    Content-Type: text/html\r
+    Content-Length: 35\r
+    \r
+    Created a Polar bear named Breezly!
+    """
+  end
+
+  # Get Markdown page. Serve it as HTML.
+  test "GET /pages/faq" do
+    request = """
+    GET /pages/faq HTTP/1.1\r
+    Host: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    \r
+    """
+
+    response = handle(request)
+
+    expected_response = """
+    HTTP/1.1 200 OK\r
+    Content-Type: text/html\r
+    Content-Length: 571\r
+    \r
+    <h1>Frequently Asked Questions</h1>
+    <ul>
+    <li><p><strong>Have you really seen Bigfoot?</strong></p>
+
+    <p>Yes! In this <a href="https://www.youtube.com/watch?v=v77ijOO8oAk">totally believable video</a>!</p></li>
+
+    <li><p><strong>No, I mean seen Bigfoot <em>on the refuge</em>?</strong></p>
+
+    <p>Oh! Not yet, but we’re still looking…</p></li>
+
+    <li><p><strong>Can you just show me some code?</strong></p>
+
+    <p>Sure! Here’s some Elixir:</p></li></ul>
+
+    <pre><codeclass=\"elixir\">[&quot;Bigfoot&quot;,&quot;Yeti&quot;,&quot;Sasquatch&quot;]|&gt;Enum.random()</code></pre>
+    """
+
+    assert remove_whitespace(response) == remove_whitespace(expected_response)
+  end
+
   defp remove_whitespace(text) do
     String.replace(text, ~r{\s}, "")
   end

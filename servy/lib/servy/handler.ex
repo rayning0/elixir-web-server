@@ -1,3 +1,4 @@
+require IEx
 defmodule Servy.Handler do
   alias Servy.Conv
   alias Servy.BearController
@@ -5,7 +6,7 @@ defmodule Servy.Handler do
   @moduledoc "Handles HTTP requests"
   @pages_path Path.expand("../../pages", __DIR__) #constant: absolute path of current file
 
-  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]  # number is arity of each function
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1, markdown_to_html: 1]  # number is arity of each function
   #import Servy.Plugins  -- or import ALL functions in module
   import Servy.Parser, only: [parse: 1]
   import Servy.FileHandler, only: [handle_file: 2]
@@ -24,6 +25,7 @@ defmodule Servy.Handler do
     |> log
     |> route
     |> track
+    |> Conv.put_conv_content_length
     |> format_response
   end
 
@@ -56,6 +58,10 @@ defmodule Servy.Handler do
     BearController.create(conv, conv.params)
   end
 
+  def route(%Conv{method: "POST", path: "/api/bears"} = conv) do
+    Servy.Api.BearController.create(conv, conv.params)
+  end
+
   def route(%Conv{method: "GET", path: "/about"} = conv) do
     @pages_path
     |> Path.join("about.html")
@@ -67,13 +73,22 @@ defmodule Servy.Handler do
   #   /pages/contact
   #   /pages/faq
   #   /pages/any-other-page
+
+  # def route(%Conv{method: "GET", path: "/pages/" <> page} = conv) do
+  #   # regex = ~r{\/pages\/(?<page>[\w'-]+)}
+  #   # page = Regex.named_captures(regex, path)["page"]
+  #   @pages_path
+  #   |> Path.join(page <> ".html")
+  #   |> File.read
+  #   |> handle_file(conv)
+  # end
+
   def route(%Conv{method: "GET", path: "/pages/" <> page} = conv) do
-    # regex = ~r{\/pages\/(?<page>[\w'-]+)}
-    # page = Regex.named_captures(regex, path)["page"]
     @pages_path
-    |> Path.join(page <> ".html")
+    |> Path.join(page <> ".md")
     |> File.read
     |> handle_file(conv)
+    |> markdown_to_html
   end
 
   def route(%Conv{method: "DELETE", path: "/bears/" <> _id} = conv) do
@@ -88,9 +103,7 @@ defmodule Servy.Handler do
     # Use values in map to make HTTP response string
     """
     HTTP/1.1 #{Conv.full_status(conv)}\r
-    Content-Type: #{conv.resp_content_type}\r
-    Content-Length: #{String.length(conv.resp_body)}\r
-    \r
+    #{Conv.format_response_headers(conv)}\r
     #{conv.resp_body}
     """
   end
