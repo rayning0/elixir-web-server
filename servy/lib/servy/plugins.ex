@@ -31,10 +31,4 @@ defmodule Servy.Plugins do
   def rewrite_path_captures(%Conv{} = conv, nil), do: conv
 
   def log(%Conv{} = conv), do: IO.inspect conv
-
-  def markdown_to_html(%Conv{status: 200} = conv) do
-    %{ conv | resp_body: Earmark.as_html!(conv.resp_body) }
-  end
-
-  def markdown_to_html(%Conv{} = conv), do: conv
 end

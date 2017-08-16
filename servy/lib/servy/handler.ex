@@ -1,4 +1,3 @@
-require IEx
 defmodule Servy.Handler do
   alias Servy.Conv
   alias Servy.BearController
@@ -6,10 +5,10 @@ defmodule Servy.Handler do
   @moduledoc "Handles HTTP requests"
   @pages_path Path.expand("../../pages", __DIR__) #constant: absolute path of current file
 
-  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1, markdown_to_html: 1]  # number is arity of each function
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]  # number is arity of each function
   #import Servy.Plugins  -- or import ALL functions in module
   import Servy.Parser, only: [parse: 1]
-  import Servy.FileHandler, only: [handle_file: 2]
+  import Servy.FileHandler, only: [handle_file: 2, markdown_to_html: 1]
 
   require Logger
 
@@ -69,26 +68,39 @@ defmodule Servy.Handler do
     |> handle_file(conv)
   end
 
-  # define one generic route function that handles arbitrary requests:
+  # one generic route function that handles routes like this:
   #   /pages/contact
   #   /pages/faq
   #   /pages/any-other-page
 
-  # def route(%Conv{method: "GET", path: "/pages/" <> page} = conv) do
-  #   # regex = ~r{\/pages\/(?<page>[\w'-]+)}
-  #   # page = Regex.named_captures(regex, path)["page"]
-  #   @pages_path
-  #   |> Path.join(page <> ".html")
-  #   |> File.read
-  #   |> handle_file(conv)
-  # end
+  def route(%Conv{method: "GET", path: ("/pages/" <> page)} = conv) do
+    # regex = ~r{\/pages\/(?<page>[\w'-]+)}
+    # page = Regex.named_captures(regex, path)["page"]
 
-  def route(%Conv{method: "GET", path: "/pages/" <> page} = conv) do
-    @pages_path
-    |> Path.join(page <> ".md")
-    |> File.read
-    |> handle_file(conv)
-    |> markdown_to_html
+    files = File.ls("pages") |> elem(1)
+
+    # If page is HTML, returns it
+    # If page is Markdown, converts it to HTML first
+    ext =
+      cond do
+        Enum.any?(files, fn(file) -> file =~ ~r/#{page}.html/ end) ->
+          ".html"
+        Enum.any?(files, fn(file) -> file =~ ~r/#{page}.md/ end) ->
+          ".md"
+        true ->
+          ""
+      end
+
+    conv = @pages_path
+           |> Path.join(page <> ext)
+           |> File.read
+           |> handle_file(conv)
+
+    if ext == ".md" do
+      conv |> markdown_to_html
+    else
+      conv
+    end
   end
 
   def route(%Conv{method: "DELETE", path: "/bears/" <> _id} = conv) do

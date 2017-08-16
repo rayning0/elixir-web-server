@@ -1,4 +1,3 @@
-require IEx
 defmodule Servy.Api.BearController do
   alias Servy.Conv
 
